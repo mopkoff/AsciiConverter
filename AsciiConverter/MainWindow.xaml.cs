@@ -12,15 +12,16 @@ namespace AsciiConverter
 {
     public partial class MainWindow : Window
     {
-        //Массив символов с соответствующими им значениями яркости. Используется для дальнейшего отображения пикселей в символы соответственно значению поля Value
+        //Массив символов с соответствующими им значениями яркости. 
+        //Используется для дальнейшего отображения пикселей в символы соответственно значению поля Value
         List<CharMap> charMapList = new List<CharMap>();
-        //Символы, не используемые при составлении картинки.
         string paramError = "Заданы некорректные параметры!";
         string converterSuccess = "Конвертация прошла успешно! Открыть полученный файл?";
         string success = "Успешно";
         Bitmap img = new Bitmap(1, 1);
         public MainWindow()
         {
+            //Символы, не используемые при составлении картинки.
             string badChars = "_`[](){}\\~|/!?\"><1";
             InitializeComponent();
             Calibrate(badChars);
@@ -30,14 +31,14 @@ namespace AsciiConverter
 
         private int getCharCount(String text, Font font)
         {
-            //создаем начальный битмап
+            //создаем исходный битмап
             Image img = new Bitmap(1, 1);
             Graphics drawing = Graphics.FromImage(img);
 
             //Получаем размер текста в заданном шрифте
             SizeF textSize = drawing.MeasureString(text, font);
 
-            //Очищаем начальный битма
+            //Очищаем исходный битмап
             img.Dispose();
             drawing.Dispose();
 
@@ -45,11 +46,9 @@ namespace AsciiConverter
             img = new Bitmap((int)textSize.Width, (int)textSize.Height);
 
             drawing = Graphics.FromImage(img);
-
-            //paint the background
+            
             drawing.Clear(Color.White);
-
-            //create a brush for the text
+            
             Brush textBrush = new SolidBrush(Color.Black);
 
             drawing.DrawString(text, font, textBrush, 0, 0);
