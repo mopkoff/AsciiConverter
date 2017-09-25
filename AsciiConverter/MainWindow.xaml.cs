@@ -7,6 +7,7 @@ using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace AsciiConverter
 {
@@ -17,18 +18,51 @@ namespace AsciiConverter
         List<CharMap> charMapList = new List<CharMap>();
         string paramError = "Заданы некорректные параметры!";
         string converterSuccess = "Конвертация прошла успешно! Открыть полученный файл?";
+        string aboutDescription = "Данная программа производит конвертацию изображений в формате jpg, jpeg, jpe, jfif, png, bmp в текстовый файл, составленный из ASCII-символов. Параметрами Width и Height задается соответственно количество символов в строке и количество строк. Сохраняется итоговый файл в тот же каталог исходного файла с сохранением исходного имени и изменением формата на.txt. Для корректного отображения рекомендуется использовать моноширные шрифты. ";        
+        string aboutCaption = "Справка";
+        string authorDescription = "Created by https://github.com/mopkoff";
+        string authorCaption = "Автор";
         string success = "Успешно";
+        //Символы, не используемые при составлении картинки.
+        string badChars = "_`[](){}\\~|/!?\"><1";
+        string defaultFont = "Consolas";
         Bitmap img = new Bitmap(1, 1);
+        Font font;
+
         public MainWindow()
         {
-            //Символы, не используемые при составлении картинки.
-            string badChars = "_`[](){}\\~|/!?\"><1";
             InitializeComponent();
-            Calibrate(badChars);
-            button2.IsEnabled = true;
+            ObservableCollection<string> fonts = new ObservableCollection<string>();
+            comboBoxFonts.DataContext = fonts;
+            fonts.Clear();
+            foreach (FontFamily font in System.Drawing.FontFamily.Families)
+            {
+                fonts.Add(font.Name);
+            }
+
+            if (fonts.Contains(defaultFont))
+            {
+                comboBoxFonts.SelectedItem = defaultFont;
+                button1.IsEnabled = true;
+            }
         }
 
 
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(aboutDescription, aboutCaption, MessageBoxButton.OK);
+        }
+
+        private void Author_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(authorDescription, authorCaption, MessageBoxButton.OK);
+        }
+
+        private void comboBoxFonts_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            button1.IsEnabled = true;
+            font = new Font((string)comboBoxFonts.SelectedItem, System.Drawing.SystemFonts.DefaultFont.Size);
+        }
         private int getCharCount(String text, Font font)
         {
             //создаем исходный битмап
@@ -67,6 +101,12 @@ namespace AsciiConverter
                         ++counter;
             return counter;
 
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            Calibrate(font, badChars);
+            button2.IsEnabled = true;
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -142,9 +182,9 @@ namespace AsciiConverter
         /// </summary>
         /// <param name="badChars"> Коллекция символов, которые игнорируются при отображении </param>
         /// <returns>0 при успешном выполнении</returns>
-        private int Calibrate(string badChars)
+        private int Calibrate(Font font, string badChars)
         {
-            Font font = new Font("Consolas", System.Drawing.SystemFonts.DefaultFont.Size);
+           // Font font = new Font("Consolas", System.Drawing.SystemFonts.DefaultFont.Size);
             List<CharMap> buffCharMapList = new List<CharMap>();
             int j = 0;
             //Минимальный шаг разности яркости соседних символов
@@ -258,6 +298,6 @@ namespace AsciiConverter
         {
             return Math.Sqrt(0.299 * c.R * c.R + 0.587 * c.G * c.G + 0.114 * c.B * c.B);
         }
-
+        
     }
 }
